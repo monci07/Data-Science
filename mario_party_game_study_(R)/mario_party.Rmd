@@ -1,0 +1,75 @@
+---
+title: "Investigacion de probabilidad de que en un juego de mario se puedan sacar mas de 6 veces en un juego normal de 15 el numero mas alto de un dado"
+output: html_notebook
+---
+
+Declaracion de algunos de los dados del juego.
+
+```{r}
+normal_d = c(1,2,3,4,5,6)
+boo_d = c(0,0,5,5,7,7)
+wario_d = c(0,0,6,6,6,6)
+shy_guy_d = c(0,4,4,4,4,4)
+```
+
+Funciones que se necesitaran para hacer la distribucion normal de las frecuencias: Esta para tener los resultados de un solo juego
+
+```{r}
+dice_record <- function(dice){
+ game = sample(dice,15, replace = TRUE)
+ names = 0:10
+ result = as.data.frame(table(names))
+ for (i in result$names)
+   result$Freq[as.integer(i)+1] = sum(game==as.integer(i))
+ return(result)
+}
+```
+
+Esta es para sacar la frecuencia
+
+```{r}
+get_frecuency <- function(table, number){
+  return(table$Freq[number+1]/15)
+}
+```
+
+Esta para hacer el bootstrap
+
+```{r}
+bootstrap <- function(dice, number, reps){
+  freq = c()
+  for (i in 1:reps) {
+    game = dice_record(dice)
+    freq = append(freq, get_frecuency(game, number))
+  }
+  return(freq)
+}
+```
+
+Ahora podemos hacer pruebas con los diferentes dados "Dado normal"
+
+```{r}
+histo = bootstrap(normal_d,6,5000)
+hist(histo, breaks = 20)
+```
+
+"Dado de boo"
+
+```{r}
+histo = bootstrap(boo_d,7,5000)
+hist(histo, breaks = 20)
+```
+
+"Dado de wario"
+
+```{r}
+histo = bootstrap(wario_d,6,5000)
+hist(histo, breaks = 20)
+```
+
+"Dado de shy guy"
+
+```{r}
+histo = bootstrap(shy_guy_d,4,5000)
+hist(histo, breaks = 15)
+```
